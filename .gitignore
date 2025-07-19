@@ -1,0 +1,4 @@
+/alembic/
+/alembic.ini
+/database.db
+/src/auth/services/.service_env
