@@ -31,10 +31,10 @@ def register_user(db: Session, data: schemas.UserCreate) -> models.User:
 def login_user(db: Session, data: schemas.UserCreate, expiry_minutes: int = 30) -> Dict:
     user = authenticate_user(db, data)
     token = create_access_token(
-        data={"sub": user.username},
-        expires_delta=timedelta(minutes=expiry_minutes)
+        data={"sub": str(user.id), "username": user.username},
+        # expires_delta=timedelta(minutes=expiry_minutes)
     )
-    refresh_token = refresh_access_token(data={"sub": user.username})
+    refresh_token = refresh_access_token(data={"sub": str(user.id), "username": user.username})
 
     return {
         "access_token": token,

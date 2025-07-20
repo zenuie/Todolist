@@ -1,5 +1,6 @@
 from pathlib import Path
 
+from fastapi import HTTPException, status, Request
 from argon2 import PasswordHasher
 import datetime
 import os
@@ -7,8 +8,8 @@ import os
 from dotenv import load_dotenv
 from jose import jwt
 
-BASE_DIR = Path(__file__).resolve().parent
-ENV_PATH = BASE_DIR / "services" / ".service_env"
+from src.auth import ENV_PATH
+
 load_dotenv(dotenv_path=ENV_PATH)
 ph = PasswordHasher()
 
@@ -32,19 +33,16 @@ ACCESS_TOKEN_EXPIRE_MINUTES: int = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 
 REFRESH_TOKEN_EXPIRE_DAYS: int = int(os.getenv("REFRESH_TOKEN_EXPIRE_DAYS", 30))
 
 
-def get_user_from_token():
-    pass
-
-
 def create_access_token(data: dict, expires_delta: datetime.timedelta = None):
     to_encode = data.copy()
-    expire = datetime.datetime.now() + (expires_delta or datetime.timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
-    to_encode.update({"exp": expire})
+    expire = datetime.datetime.now(datetime.timezone.utc) + (expires_delta or datetime.timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
+    to_encode.update({"exp": expire.timestamp()})  # JWT 要的是數字 timestamp
+
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
 
 def refresh_access_token(data: dict, expires_delta: datetime.timedelta = None):
     to_encode = data.copy()
-    expire = datetime.datetime.now() + (expires_delta or datetime.timedelta(days=ACCESS_TOKEN_EXPIRE_MINUTES))
-    to_encode.update({"exp": expire})
+    expire = datetime.datetime.now(datetime.timezone.utc) + (expires_delta or datetime.timedelta(days=ACCESS_TOKEN_EXPIRE_MINUTES))
+    to_encode.update({"exp": expire.timestamp()})  # JWT 要的是數字 timestamp
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
