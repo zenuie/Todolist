@@ -16,7 +16,7 @@ router = APIRouter(
 
 
 @router.post("/register", response_model=schemas.User)
-def register(data: schemas.UserCreate, db: Session = Depends(get_db)):
+async def register(data: schemas.UserCreate, db: Session = Depends(get_db)):
     try:
         return register_user(db, data)
     except ValueError as e:
@@ -24,7 +24,7 @@ def register(data: schemas.UserCreate, db: Session = Depends(get_db)):
 
 
 @router.post("/login", response_model=schemas.Token)
-def login(request: Request, data: schemas.UserLogin, db: Session = Depends(get_db)):
+async def login(request: Request, data: schemas.UserLogin, db: Session = Depends(get_db)):
     try:
         access_token = login_user(db, data)
         return access_token
@@ -36,13 +36,13 @@ def login(request: Request, data: schemas.UserLogin, db: Session = Depends(get_d
 
 @router.get("/user", response_model=schemas.User)
 @login_required
-def get_user(request: Request):
+async def get_user(request: Request):
     return request.state.user
 
 
 @router.put("/user", response_model=schemas.User)
 @login_required
-def update_user(
+async def update_user(
         data: schemas.UserUpdate,
         db: Session = Depends(get_db),
         current_user=Depends(get_current_user)
@@ -52,7 +52,7 @@ def update_user(
 
 @router.put("/user/change_password", response_model=schemas.User)
 @login_required
-def change_password(
+async def change_password(
         data: schemas.UserPasswordUpdate,
         db: Session = Depends(get_db),
         current_user=Depends(get_current_user)

@@ -7,7 +7,7 @@ from starlette.status import HTTP_401_UNAUTHORIZED
 
 def login_required(func):
     @wraps(func)
-    def wrapper(*args, **kwargs):
+    async def wrapper(*args, **kwargs):
         request: Request = kwargs.get("request") or (args[0] if args else None)
 
         if not hasattr(request.state, "user") or request.state.user is None:
@@ -15,6 +15,6 @@ def login_required(func):
                 status_code=HTTP_401_UNAUTHORIZED,
                 content={"detail": "Authentication invalid"},
             )
-        return func(*args, **kwargs)
+        return await func(*args, **kwargs)  # 這裡要 await
 
     return wrapper

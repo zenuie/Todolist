@@ -2,10 +2,11 @@ from pydantic import BaseModel, UUID4
 
 
 class Todo(BaseModel):
+    id: UUID4
     title: str | None = None
-    text: str | None = None
-    completed: bool | None = None
     description: str | None = None
+    complete: bool | None = None
+    sort: int | None = None
 
     class Config:
         from_attributes = True
@@ -17,19 +18,20 @@ class TodoGet(BaseModel):
 
 
 class TodoCreate(BaseModel):
-    user_id: UUID4
     title: str
     description: str
+    sort: int
 
     class Config:
         from_attributes = True
 
 
 class TodoUpdate(BaseModel):
-    user_id: UUID4
+    id: UUID4
     title: str
     description: str
-    completed: bool
+    complete: bool
+    sort: int
 
     class Config:
         from_attributes = True
