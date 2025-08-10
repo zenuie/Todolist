@@ -5,7 +5,7 @@ from starlette.requests import Request
 from src.auth import schemas
 from src.auth.decorator import login_required
 from src.database import get_db
-from src.auth.services.user_service import get_user, register_user, change_user_password, update_user_info, authenticate_user, login_user
+from src.auth.services.user_service import get_user, register_user, change_user_password, update_user_info, authenticate_user, login_user, refresh_token_flow
 from src.auth.dependencies import get_current_user  # 假設你有這個
 
 router = APIRouter(
@@ -61,3 +61,16 @@ async def change_password(
         return change_user_password(db, current_user, data)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.put("/user/refresh_token", response_model=schemas.User)
+@login_required
+async def refresh_token(
+        data: schemas.RefreshToken,
+        db: Session = Depends(get_db),
+        current_user=Depends(get_current_user)
+):
+    try:
+        return refresh_token_flow(db, current_user, data)
+    except ValueError as e:
+        raise HTTPException(status_code=401, detail=str(e))

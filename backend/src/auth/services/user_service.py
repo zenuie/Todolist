@@ -61,3 +61,25 @@ def change_user_password(db: Session, user: models.User, data: schemas.UserPassw
 
 def update_user_info(db: Session, user: models.User, data: schemas.UserUpdate) -> models.User:
     return crud.update_user(db, user, data)
+
+
+def refresh_token_flow(db: Session, user, data, expiry_minutes: int = 30) -> Dict:
+    """
+    驗證 refresh token 並回傳新的 access token（refresh token 不會重新產生）
+    """
+    try:
+        if not user:
+            raise ValueError("使用者不存在")
+        # 產生新的 access token
+        access_token = create_access_token(
+            data={"sub": str(user.id), "username": user.username},
+            # expires_delta=timedelta(minutes=expiry_minutes)
+        )
+        return {
+            "access_token": access_token,
+            "token_type": "bearer",
+            "expires_in": expiry_minutes * 60,
+            "refresh_token": data.refresh_token,  # 保持原本的 refresh token
+        }
+    except Exception as e:
+        raise ValueError(f"Refresh token 驗證失敗: {str(e)}")

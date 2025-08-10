@@ -85,3 +85,12 @@ class TokenData(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class RefreshToken(BaseModel):
+    token_type: str
+    expires_in: int
+    refresh_token: str
+
+    class Config:
+        from_attributes = True
