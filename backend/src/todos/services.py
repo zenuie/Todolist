@@ -38,4 +38,4 @@ async def update_todo_by_user(db: Session, user_id: UUID4, todo_datas: schemas.T
 async def delete_todo_by_user(db: Session, user_id: UUID4, todo_id: UUID4) -> models.Todo | List:
     if user_id is None:
         raise ValueError("User not found")
-    return crud.delete_todo(db,user_id, todo_id)
+    return crud.delete_todo(db, user_id, todo_id)
